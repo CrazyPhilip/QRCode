@@ -19,6 +19,7 @@ namespace QRCode.Views
     {
         GenerateViewModel generateViewModel = new GenerateViewModel();
 
+
         public GeneratePage()
         {
             InitializeComponent();
@@ -40,7 +41,7 @@ namespace QRCode.Views
 
         private void GenerateButton_Clicked(object sender, EventArgs e)
         {
-            var barcode = new ZXingBarcodeImageView
+            ZXingBarcodeImageView barcode = new ZXingBarcodeImageView
             {
                 HorizontalOptions = LayoutOptions.CenterAndExpand,
                 VerticalOptions = LayoutOptions.CenterAndExpand,
@@ -65,10 +66,11 @@ namespace QRCode.Views
 
             string value = JsonConvert.SerializeObject(productInfo);
             string base64 = Base64Helper.Base64Encode(value);
-            Console.WriteLine(base64);
-            barcode.BarcodeValue = base64;
+            //Console.WriteLine(base64);
+            //barcode.BarcodeValue = base64;
+            generateViewModel.BarCode = base64;
 
-            CodeStack.Children.Add(barcode);
+            //CodeStack.Children.Add(barcode);
         }
     }
 }

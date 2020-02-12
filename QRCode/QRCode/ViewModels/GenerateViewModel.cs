@@ -7,6 +7,14 @@ namespace QRCode.ViewModels
 {
     public class GenerateViewModel : BaseViewModel
     {
+        private string barCode;   //Comment
+        public string BarCode
+        {
+            get { return barCode; }
+            set { SetProperty(ref barCode, value); }
+        }
+
+
         private ProductInfo product;   //Comment
         public ProductInfo Product
         {

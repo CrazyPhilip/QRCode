@@ -6,6 +6,7 @@
              mc:Ignorable="d"
              x:Class="QRCode.Views.GeneratePage"
              xmlns:controls="clr-namespace:QRCode.Controls"
+             xmlns:forms="clr-namespace:ZXing.Net.Mobile.Forms;assembly=ZXing.Net.Mobile.Forms"
              Icon="add.png"
              Title="生成二维码">
     <ContentPage.Content>
@@ -16,7 +17,11 @@
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
 
-            <StackLayout x:Name="CodeStack" Grid.Row="0" BackgroundColor="{StaticResource NavigationPrimary}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"/>
+            <StackLayout x:Name="CodeStack" Grid.Row="0" BackgroundColor="{StaticResource NavigationPrimary}" 
+                         HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                <forms:ZXingBarcodeImageView BarcodeFormat="QR_CODE" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"
+                                             Margin="10" BarcodeValue="{Binding BarCode}"/>
+            </StackLayout>
 
             <ScrollView Grid.Row="1">
                 <Grid>
