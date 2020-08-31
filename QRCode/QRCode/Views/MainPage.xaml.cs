@@ -13,6 +13,8 @@ namespace QRCode.Views
         public MainPage()
         {
             InitializeComponent();
+
+            this.SelectedItem = scanPage;
         }
     }
 }

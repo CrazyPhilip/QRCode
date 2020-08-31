@@ -4,15 +4,16 @@
             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
             xmlns:android="clr-namespace:Xamarin.Forms.PlatformConfiguration.AndroidSpecific;assembly=Xamarin.Forms.Core"
+            xmlns:views="clr-namespace:QRCode.Views"
             android:TabbedPage.ToolbarPlacement="Bottom"
             android:TabbedPage.BarItemColor="LightGray"
-            android:TabbedPage.BarSelectedItemColor="{StaticResource NavigationPrimary}"
+            android:TabbedPage.BarSelectedItemColor="{StaticResource PrimaryColor}"
             android:TabbedPage.IsSwipePagingEnabled="True"
             mc:Ignorable="d"
-            xmlns:views="clr-namespace:QRCode.Views"
             x:Class="QRCode.Views.MainPage">
 
-    <views:ScanPage/>
-    <views:GeneratePage/>
+    <views:SettingPage x:Name="settingPage"/>
+    <views:ScanPage x:Name="scanPage"/>
+    <views:GeneratePage x:Name="generatePage"/>
 
 </TabbedPage>

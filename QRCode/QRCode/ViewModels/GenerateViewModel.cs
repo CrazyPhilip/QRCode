@@ -1,81 +1,167 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Drawing;
+using System.IO;
 using System.Text;
+using Plugin.Toast;
+using Plugin.Toast.Abstractions;
 using QRCode.Models;
+using QRCode.Util;
+using Xamarin.Essentials;
+using Xamarin.Forms;
+using ZXing;
+using ZXing.Common;
+using ZXing.Mobile;
 
 namespace QRCode.ViewModels
 {
     public class GenerateViewModel : BaseViewModel
     {
-        private string barCode;   //Comment
-        public string BarCode
+        private string jsonBarCode;   //Json二维码
+        public string JsonBarCode
         {
-            get { return barCode; }
-            set { SetProperty(ref barCode, value); }
+            get { return jsonBarCode; }
+            set { SetProperty(ref jsonBarCode, value); }
         }
 
-
-        private ProductInfo product;   //Comment
-        public ProductInfo Product
+        private string plainTextBarCode;   //自由文本二维码
+        public string PlainTextBarCode
         {
-            get { return product; }
-            set { SetProperty(ref product, value); }
+            get { return plainTextBarCode; }
+            set { SetProperty(ref plainTextBarCode, value); }
         }
 
-        private string productName;   //Comment
-        public string ProductName
+        private ObservableCollection<JsonItem> jsonList;   //键值对列表
+        public ObservableCollection<JsonItem> JsonList
         {
-            get { return productName; }
-            set { SetProperty(ref productName, value); }
+            get { return jsonList; }
+            set { SetProperty(ref jsonList, value); }
         }
 
-        private string weight;   //Comment
-        public string Weight
+        private string plainText;   //自由文本
+        public string PlainText
         {
-            get { return weight; }
-            set { SetProperty(ref weight, value); }
+            get { return plainText; }
+            set { SetProperty(ref plainText, value); }
         }
 
-        private string recipientName;   //Comment
-        public string RecipientName
+        private int index { get; set; }
+
+        public Command<int> DeleteCommand { get; set; }
+        public Command ClearJsonCommand { get; set; }
+        public Command ClearPlainTextCommand { get; set; }
+        public Command GenerateJsonCommand { get; set; }
+        public Command GeneratePlainTextCommand { get; set; }
+        public Command AddRowCommand { get; set; }
+        public Command<string> SaveCommand { get; set; }
+
+        public GenerateViewModel()
         {
-            get { return recipientName; }
-            set { SetProperty(ref recipientName, value); }
+            //BarCode = string.Empty;
+            index = 0;
+            JsonList = new ObservableCollection<JsonItem>()
+            {
+                new JsonItem { Id = index, Checked = true, Key = string.Empty, Value = string.Empty }
+            };
+
+            DeleteCommand = new Command<int>((id) =>
+            {
+                if (JsonList.Count == 1) { return; }
+                int i = 0;
+                foreach (var item in JsonList)
+                {
+                    if (item.Id == id)
+                    {
+                        i = JsonList.IndexOf(item);
+                    }
+                }
+                JsonList.RemoveAt(i);
+                //JsonList.RemoveAt(id);
+                //index--;
+                //for (int i = 0; i < JsonList.Count; i++)
+                //{
+                //    JsonList[i].Id = i;
+                //}
+            }, (id) => { return true; });
+
+            ClearJsonCommand = new Command(() =>
+            {
+                index = 0;
+                JsonList = new ObservableCollection<JsonItem>()
+                {
+                    new JsonItem { Id = index, Checked = true, Key = string.Empty, Value = string.Empty }
+                };
+            }, () => { return true; });
+
+            GenerateJsonCommand = new Command(() =>
+            {
+                GenerateJson();
+            }, () => { return true; });
+
+            AddRowCommand = new Command(() =>
+            {
+                index++;
+                JsonList.Add(new JsonItem { Id = index, Checked = true, Key = string.Empty, Value = string.Empty });
+            }, () => { return true; });
+
+            ClearPlainTextCommand = new Command(async () =>
+            {
+                bool action = await Application.Current.MainPage.DisplayAlert("Warning", "请问要清空自由文本吗？", "确定", "取消");
+                if (action)
+                {
+                    PlainText = string.Empty;
+                }
+            }, () => { return true; });
+
+            GeneratePlainTextCommand = new Command(() =>
+            {
+                if (string.IsNullOrWhiteSpace(PlainText))
+                {
+                    CrossToastPopUp.Current.ShowToastWarning("空字符串，请检查", ToastLength.Long);
+                    return;
+                }
+                else
+                {
+                    string base64 = Base64Helper.Base64Encode(Encoding.UTF8, PlainText);
+                    PlainTextBarCode = base64;
+                }
+            }, () => { return true; });
+
+            SaveCommand = new Command<string>((code) =>
+            {
+                MessagingCenter.Send(new object(), "Save", code);
+                
+            }, (code) => { return true; });
+
         }
 
-        private string recipientPhone;   //Comment
-        public string RecipientPhone
+        /// <summary>
+        /// 生成二维码 json格式
+        /// </summary>
+        private void GenerateJson()
         {
-            get { return recipientPhone; }
-            set { SetProperty(ref recipientPhone, value); }
-        }
+            string value = "";
+            int count = JsonList.Count;
+            for (int i = 0; i < count; i++)
+            {
+                if (string.IsNullOrWhiteSpace(JsonList[i].Key) || !JsonList[i].Checked) { continue; }
+                value += "\"" + JsonList[i].Key + "\":\"" + JsonList[i].Value + "\"";
+                value += count - i == 0 ? "" : ",";
+            }
 
-        private string recipientAddress;   //Comment
-        public string RecipientAddress
-        {
-            get { return recipientAddress; }
-            set { SetProperty(ref recipientAddress, value); }
-        }
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                CrossToastPopUp.Current.ShowToastWarning("空字符串，请检查", ToastLength.Long);
+                return;
+            }
+            else
+            {
+                value = "{" + value + "}";
+            }
 
-        private string senderName;   //Comment
-        public string SenderName
-        {
-            get { return senderName; }
-            set { SetProperty(ref senderName, value); }
-        }
+            string base64 = Base64Helper.Base64Encode(Encoding.UTF8, value);
+            JsonBarCode = base64;
 
-        private string senderPhone;   //Comment
-        public string SenderPhone
-        {
-            get { return senderPhone; }
-            set { SetProperty(ref senderPhone, value); }
-        }
-
-        private string senderAddress;   //Comment
-        public string SenderAddress
-        {
-            get { return senderAddress; }
-            set { SetProperty(ref senderAddress, value); }
         }
 
     }

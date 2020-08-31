@@ -3,21 +3,99 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d"
-             x:Class="QRCode.Views.GeneratePage"
              xmlns:controls="clr-namespace:QRCode.Controls"
              xmlns:forms="clr-namespace:ZXing.Net.Mobile.Forms;assembly=ZXing.Net.Mobile.Forms"
+             xmlns:tabView="clr-namespace:Xam.Plugin.TabView;assembly=Xam.Plugin.TabView"
+             xmlns:viewModels="clr-namespace:QRCode.ViewModels" xmlns:common="clr-namespace:ZXing.Common;assembly=zxing.portable"
+             mc:Ignorable="d"
+             x:Class="QRCode.Views.GeneratePage"
+             x:Name="generatePage"
+             BackgroundColor="{DynamicResource PageBackgroundColor}"
              Icon="add.png"
              Title="生成二维码">
+
+    <ContentPage.BindingContext>
+        <viewModels:GenerateViewModel/>
+    </ContentPage.BindingContext>
+
     <ContentPage.Content>
-        <Grid>
+        <tabView:TabViewControl BackgroundColor="{DynamicResource PageBackgroundColor}">
+            <tabView:TabViewControl.ItemSource>
+                <tabView:TabItem HeaderText="Json格式">
+                    <Grid RowDefinitions="*,40" ColumnDefinitions="*,*,*" Padding="10,0,10,10">
+                        <ScrollView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
+                            <StackLayout>
+                                <Frame HeightRequest="200" WidthRequest="200" Padding="5" CornerRadius="5" HasShadow="True" BackgroundColor="{DynamicResource ControlBackgroundColor}" Margin="10" HorizontalOptions="Center" VerticalOptions="Center">
+                                    <forms:ZXingBarcodeImageView x:Name="zXingBarcodeImageView" BarcodeFormat="QR_CODE" BarcodeValue="{Binding JsonBarCode}">
+                                        <forms:ZXingBarcodeImageView.BarcodeOptions>
+                                            <common:EncodingOptions Width="500" Height="500" Margin="10" PureBarcode="True"/>
+                                        </forms:ZXingBarcodeImageView.BarcodeOptions>
+                                    </forms:ZXingBarcodeImageView>
+                                </Frame>
+
+                                <StackLayout Orientation="Vertical" BindableLayout.ItemsSource="{Binding JsonList}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid ColumnDefinitions="30,*,*,30">
+                                                <CheckBox Grid.Column="0" IsChecked="{Binding Checked}"/>
+                                                <controls:MyEntry Grid.Column="1" Text="{Binding Key}" Placeholder="Key" PlaceholderColor="{DynamicResource TertiaryTextColor}" TextColor="{DynamicResource PrimaryTextColor}" ClearButtonVisibility="WhileEditing"/>
+                                                <controls:MyEntry Grid.Column="2" Text="{Binding Value}" Placeholder="Value" PlaceholderColor="{DynamicResource TertiaryTextColor}" TextColor="{DynamicResource PrimaryTextColor}" ClearButtonVisibility="WhileEditing"/>
+                                                <ImageButton Grid.Column="3" HeightRequest="20" WidthRequest="20" Source="delete.png" BackgroundColor="Transparent" HorizontalOptions="Center" VerticalOptions="Center"
+                                                        Command="{Binding BindingContext.DeleteCommand,Source={x:Reference generatePage}}"
+                                                        CommandParameter="{Binding Id,Mode=TwoWay}"/>
+                                                <BoxView Grid.Column="0" Grid.ColumnSpan="4" HeightRequest="1" BackgroundColor="WhiteSmoke" VerticalOptions="End"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </StackLayout>
+
+                                <Button Text="添加" TextColor="White" BackgroundColor="{DynamicResource SecondaryColor}" HeightRequest="40" Command="{Binding AddRowCommand}"/>
+                            </StackLayout>
+                        </ScrollView>
+
+                        <Button Grid.Row="1" Grid.Column="0" Text="清除" TextColor="White" BackgroundColor="LightGray"
+                                Command="{Binding ClearJsonCommand}"/>
+
+                        <Button Grid.Row="1" Grid.Column="1" Text="生成" TextColor="White" BackgroundColor="{DynamicResource PrimaryColor}"
+                                Command="{Binding GenerateJsonCommand}"/>
+
+                        <Button Grid.Row="1" Grid.Column="2" Text="保存图片" TextColor="White" BackgroundColor="{DynamicResource SecondaryColor}"
+                                Command="{Binding SaveCommand}" CommandParameter="{Binding JsonBarCode}"/>
+                    </Grid>
+                </tabView:TabItem>
+
+                <tabView:TabItem HeaderText="自由文本">
+                    <Grid RowDefinitions="*,40" ColumnDefinitions="*,*,*" Padding="10,0,10,10">
+                        <StackLayout Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
+                            <Frame HeightRequest="200" WidthRequest="200" Padding="5" CornerRadius="5" HasShadow="True" BackgroundColor="{DynamicResource ControlBackgroundColor}" Margin="10" HorizontalOptions="Center" VerticalOptions="Center">
+                                <forms:ZXingBarcodeImageView BarcodeFormat="QR_CODE" BarcodeValue="{Binding PlainTextBarCode}">
+                                    <forms:ZXingBarcodeImageView.BarcodeOptions>
+                                        <common:EncodingOptions Width="500" Height="500" Margin="10" PureBarcode="True"/>
+                                    </forms:ZXingBarcodeImageView.BarcodeOptions>
+                                </forms:ZXingBarcodeImageView>
+                            </Frame>
+
+                            <Editor Text="{Binding PlainText}" Placeholder="请输入" HeightRequest="200" PlaceholderColor="{DynamicResource TertiaryTextColor}" TextColor="{DynamicResource PrimaryTextColor}"/>
+
+                        </StackLayout>
+
+                        <Button Grid.Row="1" Grid.Column="0" Text="清除" TextColor="White" BackgroundColor="LightGray" Command="{Binding ClearPlainTextCommand}" HeightRequest="40"/>
+
+                        <Button Grid.Row="1" Grid.Column="1" Text="生成" TextColor="White" BackgroundColor="{DynamicResource PrimaryColor}" Command="{Binding GeneratePlainTextCommand}" HeightRequest="40"/>
+                        <Button Grid.Row="1" Grid.Column="2" Text="保存图片" TextColor="White" BackgroundColor="{DynamicResource SecondaryColor}" HeightRequest="40" Command="{Binding SaveCommand}" CommandParameter="{Binding PlainTextBarCode}"/>
+                    </Grid>
+                </tabView:TabItem>
+            </tabView:TabViewControl.ItemSource>
+        </tabView:TabViewControl>
+        
+        <!--<Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="4*"/>
                 <RowDefinition Height="5*"/>
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
 
-            <StackLayout x:Name="CodeStack" Grid.Row="0" BackgroundColor="{StaticResource NavigationPrimary}" 
+            <StackLayout x:Name="CodeStack" Grid.Row="0" BackgroundColor="{StaticResource PrimaryColor}" 
                          HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
                 <forms:ZXingBarcodeImageView BarcodeFormat="QR_CODE" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"
                                              Margin="10" BarcodeValue="{Binding BarCode}"/>
@@ -119,9 +197,9 @@
                     VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
 
                 <Button x:Name="GenerateButton" Text="生成" Clicked="GenerateButton_Clicked" TextColor="White"
-                    HeightRequest="50" WidthRequest="200" FontSize="Title" BackgroundColor="{StaticResource NavigationPrimary}"
+                    HeightRequest="50" WidthRequest="200" FontSize="Title" BackgroundColor="{StaticResource PrimaryColor}"
                     VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
             </StackLayout>
-        </Grid>
+        </Grid>-->
     </ContentPage.Content>
 </ContentPage>

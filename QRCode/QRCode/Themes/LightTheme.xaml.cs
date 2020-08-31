@@ -1,17 +1,14 @@
-﻿
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
-namespace QRCode.Views
+namespace HouseSource.Themes
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class GeneratePage : ContentPage
+    public partial class LightTheme : ResourceDictionary
     {
-        public GeneratePage()
+        public LightTheme()
         {
             InitializeComponent();
-
         }
-
     }
 }

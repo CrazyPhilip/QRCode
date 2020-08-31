@@ -1,32 +1,18 @@
-﻿using Newtonsoft.Json;
-using Plugin.Permissions;
-using Plugin.Permissions.Abstractions;
-using QRCode.Util;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using QRCode.Models;
-using QRCode.ViewModels;
 
 namespace QRCode.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ScanPage : ContentPage
     {
-        ScanViewModel scanViewModel = new ScanViewModel();
-
         public ScanPage()
         {
             InitializeComponent();
 
-            BindingContext = scanViewModel;
         }
 
+        /*
         private void SacnButton_Clicked(object sender, EventArgs e)
         {
             OnQRCodeButton();
@@ -89,5 +75,6 @@ namespace QRCode.Views
 
             return status == PermissionStatus.Granted;
         }
+        */
     }
 }

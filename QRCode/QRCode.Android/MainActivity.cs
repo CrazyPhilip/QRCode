@@ -8,31 +8,25 @@ using Android.Widget;
 using Android.OS;
 using System.Threading.Tasks;
 using Android.Content;
+using CarouselView.FormsPlugin.Android;
+using ZXing;
+using Android.Graphics;
+using ZXing.Common;
+using Xamarin.Essentials;
+using System.IO;
+using Path = System.IO.Path;
+using Xamarin.Forms;
+using Plugin.Toast;
+using ToastLength = Plugin.Toast.Abstractions.ToastLength;
+using Android.Database;
+using Android.Provider;
+using Android.Net;
 
 namespace QRCode.Droid
 {
     [Activity(Label = "QRCode", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
-        /*
-        protected override void OnCreate(Bundle savedInstanceState)
-        {
-            TabLayoutResource = Resource.Layout.Tabbar;
-            ToolbarResource = Resource.Layout.Toolbar;
-
-            base.OnCreate(savedInstanceState);
-
-            Xamarin.Essentials.Platform.Init(this, savedInstanceState);
-            global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            LoadApplication(new App());
-        }
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
-        {
-            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-
-            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-        }*/
-
         protected override void OnCreate(Bundle bundle)
         {
             Current = this;
@@ -40,6 +34,44 @@ namespace QRCode.Droid
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 
+
+            MessagingCenter.Subscribe<object, string>(this, "Save", (sender, args) =>
+            {
+                var path = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath + "/qrcode";
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                var file = Path.Combine(path, DateTime.Now.ToString("yyyyMMddhhmmss") + ".png");
+                using (FileStream fs = new FileStream(file, FileMode.Create))
+                {
+                    BarcodeWriter<Bitmap> writer = new BarcodeWriter<Bitmap>();
+                    writer.Format = BarcodeFormat.QR_CODE;
+                    writer.Options = new EncodingOptions()
+                    {
+                        Height = 512,
+                        Width = 512
+                    };
+                    writer.Renderer = new BitmapRenderer();
+                    Bitmap bitmap = writer.Write(args);
+                    //bitmap.Save(Path.Combine(FileSystem.AppDataDirectory, DateTime.Now.ToString()));
+                    bitmap.Compress(Bitmap.CompressFormat.Png, 100, fs);
+                    fs.Flush();
+                }
+
+                RunOnUiThread(() =>
+                {
+                    if (File.Exists(file))
+                    {
+                        CrossToastPopUp.Current.ShowToastSuccess("已保存到" + file, ToastLength.Long);
+                    }
+                    else
+                    {
+                        CrossToastPopUp.Current.ShowToastError("出现错误", ToastLength.Long);
+                    }
+                });
+            });
+            
             /*
             if (Build.VERSION.SdkInt >= Build.VERSION_CODES.Kitkat)
             {                
@@ -55,7 +87,10 @@ namespace QRCode.Droid
 
             global::Xamarin.Forms.Forms.Init(this, bundle);
 
+            CarouselViewRenderer.Init();
             FFImageLoading.Forms.Platform.CachedImageRenderer.Init(enableFastRenderer: false);
+            Xamarin.Essentials.Platform.Init(Application);
+            ZXing.Net.Mobile.Forms.Android.Platform.Init();
 
             LoadApplication(new App());
         }
@@ -67,16 +102,34 @@ namespace QRCode.Droid
 
         public TaskCompletionSource<string> PickImageTaskCompletionSource { set; get; }
 
-        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        protected override void OnActivityResult(int requestCode, Android.App.Result resultCode, Intent intent)
         {
-            base.OnActivityResult(requestCode, resultCode, data);
+            base.OnActivityResult(requestCode, resultCode, intent);
 
             if (requestCode == PickImageId)
             {
-                if ((resultCode == Result.Ok) && (data != null))
+                if ((resultCode == Android.App.Result.Ok) && (intent != null))
                 {
+                    string path = null;
                     // Set the filename as the completion of the Task
-                    PickImageTaskCompletionSource.SetResult(data.DataString);
+                    Android.Net.Uri uri = intent.Data;
+                    ICursor cursor = ContentResolver.Query(uri, null, null, null, null);
+                    if (cursor == null)
+                    {
+                        return;
+                    }
+                    if (cursor.MoveToFirst())
+                    {
+                        try
+                        {
+                            path = cursor.GetString(cursor.GetColumnIndex(MediaStore.MediaColumns.Data));
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+                    cursor.Close();
+                    PickImageTaskCompletionSource.SetResult(path);
                 }
                 else
                 {
@@ -84,5 +137,6 @@ namespace QRCode.Droid
                 }
             }
         }
+
     }
 }

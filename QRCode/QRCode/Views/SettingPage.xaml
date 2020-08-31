@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:viewModels="clr-namespace:QRCode.ViewModels" 
+             xmlns:ff="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms" xmlns:controls="clr-namespace:QRCode.Controls"
+             mc:Ignorable="d"
+             x:Class="QRCode.Views.SettingPage"
+             x:Name="settingPage"
+             BackgroundColor="{DynamicResource PageBackgroundColor}"
+             Icon="setting.png"
+             Title="设置">
+    
+    <ContentPage.BindingContext>
+        <viewModels:SettingViewModel/>
+    </ContentPage.BindingContext>
+
+    <ContentPage.Content>
+        <ScrollView Orientation="Vertical">
+            <StackLayout Orientation="Vertical" Margin="10">
+                <ff:CachedImage Source="qrcode.png" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center"/>
+                <Label Text="QRCode" TextColor="{DynamicResource PrimaryTextColor}" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <Label Text="{Binding CurrentVersion,StringFormat='版本号：{0}'}" TextColor="{DynamicResource SecondaryTextColor}" HorizontalOptions="Center" FontSize="12"/>
+
+                <controls:FluentSwitch OptionName="夜间模式" IsToggled="{Binding DarkModeIsToggled}" ToggledCommand="{Binding ThemeCommand}" 
+                                       OptionColor="{DynamicResource PrimaryTextColor}" InnerBackgroundColor="{DynamicResource ControlBackgroundColor}" BorderColor="{DynamicResource ControlBackgroundColor}"/>
+
+                <controls:FluentButton OptionName="清除缓存" Command="{Binding ClearCacheCommand}" 
+                                       OptionColor="{DynamicResource PrimaryTextColor}" InnerBackgroundColor="{DynamicResource ControlBackgroundColor}" BorderColor="{DynamicResource ControlBackgroundColor}"/>
+
+                <controls:FluentButton OptionName="版本更新" Description="{Binding Rate}" Command="{Binding UpdateCommand}"
+                                       OptionColor="{DynamicResource PrimaryTextColor}" InnerBackgroundColor="{DynamicResource ControlBackgroundColor}" BorderColor="{DynamicResource ControlBackgroundColor}"/>
+
+                <StackLayout Orientation="Vertical" VerticalOptions="EndAndExpand" HorizontalOptions="Center">
+                    <Label Text="隐私政策、权限说明、帮助、服务条款、官网" HorizontalOptions="Center" FontSize="10" TextColor="{DynamicResource SecondaryTextColor}"/>
+                    <Label Text="CrazyPhilip" HorizontalOptions="Center" FontSize="10" TextColor="{DynamicResource SecondaryTextColor}"/>
+                    <Label Text="Copyright©2019 版权所有" HorizontalOptions="Center" FontSize="10" TextColor="{DynamicResource SecondaryTextColor}"/>
+                </StackLayout>
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

@@ -49,8 +49,6 @@ namespace QRCode.Util
             SetColumnSpan(Options.BottomLabel, 3);
             Children.Add(Options.BottomLabel);
 
-
-
             var tapGestureRecognizer = new TapGestureRecognizer();
             tapGestureRecognizer.Tapped += (sender, e) =>
             {
