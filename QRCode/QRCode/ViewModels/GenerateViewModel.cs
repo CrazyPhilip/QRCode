@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Drawing;
-using System.IO;
+﻿using System.Collections.ObjectModel;
 using System.Text;
+using System.Threading.Tasks;
 using Plugin.Toast;
 using Plugin.Toast.Abstractions;
 using QRCode.Models;
 using QRCode.Util;
 using Xamarin.Essentials;
 using Xamarin.Forms;
-using ZXing;
-using ZXing.Common;
-using ZXing.Mobile;
 
 namespace QRCode.ViewModels
 {
@@ -127,10 +122,12 @@ namespace QRCode.ViewModels
                 }
             }, () => { return true; });
 
-            SaveCommand = new Command<string>((code) =>
+            SaveCommand = new Command<string>(async (code) =>
             {
-                MessagingCenter.Send(new object(), "Save", code);
-                
+                if (await GetReadPermissionAsync())
+                {
+                    MessagingCenter.Send(new object(), "Save", code);
+                }
             }, (code) => { return true; });
 
         }
@@ -146,7 +143,7 @@ namespace QRCode.ViewModels
             {
                 if (string.IsNullOrWhiteSpace(JsonList[i].Key) || !JsonList[i].Checked) { continue; }
                 value += "\"" + JsonList[i].Key + "\":\"" + JsonList[i].Value + "\"";
-                value += count - i == 0 ? "" : ",";
+                value += count - i == 1 ? "" : ",";
             }
 
             if (string.IsNullOrWhiteSpace(value))
@@ -164,5 +161,22 @@ namespace QRCode.ViewModels
 
         }
 
+        /// <summary>
+        /// 获取存储权限
+        /// </summary>
+        /// <returns></returns>
+        private async Task<bool> GetReadPermissionAsync()
+        {
+            var status = await PermissionHelper.CheckAndRequestPermissionAsync(new Permissions.StorageWrite());
+            if (status != PermissionStatus.Granted)
+            {
+                CrossToastPopUp.Current.ShowToastMessage("写入权限：" + status, ToastLength.Long);
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }

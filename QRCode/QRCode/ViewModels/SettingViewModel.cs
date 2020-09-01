@@ -1,4 +1,6 @@
 ﻿using HouseSource.Themes;
+using Plugin.Toast;
+using Plugin.Toast.Abstractions;
 using QRCode.Util;
 using System.Collections.Generic;
 using Xamarin.Essentials;
@@ -39,6 +41,7 @@ namespace QRCode.ViewModels
         public Command ThemeCommand { get; set; }
         public Command ClearCacheCommand { get; set; }
         public Command UpdateCommand { get; set; }
+        public Command MoreCommand { get; set; }
 
         public SettingViewModel()
         {
@@ -76,11 +79,24 @@ namespace QRCode.ViewModels
                 //{
                 //    CrossToastPopUp.Current.ShowToastSuccess("清理完成，共清理" + total.ToString() + "条数据", ToastLength.Long);
                 //}
+                CrossToastPopUp.Current.ShowToastMessage("下次更新，感谢使用", ToastLength.Long);
             }, () => { return true; });
 
-            UpdateCommand = new Command(async () =>
+            UpdateCommand = new Command(() =>
             {
                 //await CheckAppVersionAsync();
+                CrossToastPopUp.Current.ShowToastMessage("请到应用商店更新，感谢使用", ToastLength.Long);
+            }, () => { return true; });
+
+            MoreCommand = new Command(async () =>
+            {
+                await Browser.OpenAsync("http://www.crazyphilip.space/", new BrowserLaunchOptions
+                {
+                    LaunchMode = BrowserLaunchMode.SystemPreferred,
+                    TitleMode = BrowserTitleMode.Show,
+                    PreferredToolbarColor = Color.FromHex("#2196F3"),
+                    PreferredControlColor = Color.FromHex("#2196F3")
+                });
             }, () => { return true; });
 
         }

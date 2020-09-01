@@ -20,10 +20,11 @@ namespace QRCode.Droid
             Intent intent = new Intent(Intent.ActionPick);
             intent.SetType("image/*");
             //intent.PutExtra(Intent.ExtraAllowMultiple, false);
+            intent.SetAction(Intent.ActionGetContent);
 
             // Start the picture-picker activity (resumes in MainActivity.cs)
             MainActivity.Current.StartActivityForResult(
-                Intent.CreateChooser(intent, "Select Photo"),
+                Intent.CreateChooser(intent, "Select Image"),
                 MainActivity.PickImageId);
 
             // Save the TaskCompletionSource object as a MainActivity property

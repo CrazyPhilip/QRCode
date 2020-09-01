@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Xamarin.Forms;
 using ZXing.Net.Mobile.Forms;
 
@@ -23,7 +21,7 @@ namespace QRCode.Util
             _zxing = new ZXingScannerView
             {
                 HorizontalOptions = LayoutOptions.FillAndExpand,
-                VerticalOptions = LayoutOptions.FillAndExpand,
+                VerticalOptions = LayoutOptions.Center,
                 AutomationId = "zxingScannerView",
             };
 

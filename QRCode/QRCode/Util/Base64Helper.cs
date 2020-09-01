@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace QRCode.Util
@@ -66,6 +67,36 @@ namespace QRCode.Util
                 decode = result;
             }
             return decode;
+        }
+
+        private static readonly HashSet<char> h = new HashSet<char>(){
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+            'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
+            'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+            'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/', '='
+        };
+
+        /// <summary>
+        /// Base64格式检测
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static bool IsBase64(string s)
+        {
+            if (string.IsNullOrEmpty(s))
+                return false;
+            else if (s.Any(c => !h.Contains(c)))
+                return false;
+
+            try
+            {
+                Convert.FromBase64String(s);
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
         }
     }
 }

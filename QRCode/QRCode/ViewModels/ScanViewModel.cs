@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using ZXing;
+using ZXing.Common;
+using System.Drawing;
 
 namespace QRCode.ViewModels
 {
@@ -81,7 +83,8 @@ namespace QRCode.ViewModels
 
             SelectImageCommand = new Command(() =>
             {
-                SelectImage();
+                CrossToastPopUp.Current.ShowToastMessage("暂未开放，感谢使用", ToastLength.Long);
+                //SelectImage();
             }, () => { return true; });
 
         }
@@ -95,7 +98,7 @@ namespace QRCode.ViewModels
             {
                 var options = new ZXingScanOverlayOptions()
                 {
-                    ScanColor = Color.DeepSkyBlue, // 扫描框颜色
+                    ScanColor = Xamarin.Forms.Color.DeepSkyBlue, // 扫描框颜色
                     ShowFlash = true // 闪光灯
                 };
 
@@ -106,10 +109,7 @@ namespace QRCode.ViewModels
                 {
                     if (result != null)
                     {
-                        Text = Base64Helper.Base64Decode(result.Text);
-                        //registerViewModel.Invitation = JsonConvert.DeserializeObject<InvitationInfo>(decodeText);
-                        //Console.WriteLine(JsonConvert.DeserializeObject<InvitationInfo>(decodeText));
-
+                        Text = Base64Helper.IsBase64(result.Text) ? Base64Helper.Base64Decode(result.Text) : result.Text;
                     }
                 };
 
@@ -131,23 +131,68 @@ namespace QRCode.ViewModels
                     CrossToastPopUp.Current.ShowToastWarning("取消选择", ToastLength.Long);
                     return;
                 }
-
-                using (FileStream fs = new FileStream(image, FileMode.Open))
+                else
                 {
-                    byte[] bytes = new byte[fs.Length];
-                    fs.Read(bytes, 0, bytes.Length);
-
-                    BarcodeReader reader = new BarcodeReader();
-                    string text = reader.Decode(bytes).Text;
-                    if (!string.IsNullOrWhiteSpace(text))
-                    {
-                        Text = text;
-                    }
-                    else
-                    {
-                        CrossToastPopUp.Current.ShowToastError("没有检测到二维码", ToastLength.Long);
-                    }
+                    Text = image;
                 }
+
+                //using (FileStream fs = new FileStream(image, FileMode.Open))
+                //{
+                //    byte[] bytes = new byte[fs.Length];
+                //    fs.Read(bytes, 0, bytes.Length);
+
+                //    BarcodeReader reader = new BarcodeReader()
+                //    {
+                //        Options = new ZXing.Common.DecodingOptions
+                //        {
+                //            TryHarder = false,
+                //            PossibleFormats = new List<BarcodeFormat> { BarcodeFormat.QR_CODE }
+                //        }
+                //    };
+                //    reader.AutoRotate = true;
+                //    reader.ResultFound += Reader_ResultFound;
+                //    reader.Decode(bytes);
+                //}
+
+                //using (FileStream fs = new FileStream(image, FileMode.Open))
+                //{
+                //    Bitmap bitmap = (Bitmap)System.Drawing.Image.FromFile(image);
+
+                //    int h = bitmap.Height;
+                //    int w = bitmap.Width;
+
+                //    byte[] bytes = new byte[fs.Length];
+                //    fs.Read(bytes, 0, bytes.Length);
+
+
+
+                //    RGBLuminanceSource rGBLuminanceSource = new RGBLuminanceSource(bytes, w, h);
+                //    BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(rGBLuminanceSource));
+                //    Result result = new MultiFormatReader().decode(binaryBitmap);
+
+                //    if (!string.IsNullOrWhiteSpace(result.Text))
+                //    {
+                //        Text = result.Text;
+                //    }
+                //    else
+                //    {
+                //        CrossToastPopUp.Current.ShowToastError("没有检测到二维码", ToastLength.Long);
+                //    }
+
+                //    bitmap.Dispose();
+                //}
+            }
+        }
+
+        private void Reader_ResultFound(Result obj)
+        {
+            if (!string.IsNullOrWhiteSpace(obj.Text))
+            {
+                Text = obj.Text;
+            }
+            else
+            {
+                CrossToastPopUp.Current.ShowToastError("没有检测到二维码", ToastLength.Long);
             }
         }
 

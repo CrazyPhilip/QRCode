@@ -21,7 +21,7 @@
             <StackLayout Orientation="Vertical" Margin="10">
                 <ff:CachedImage Source="qrcode.png" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center"/>
                 <Label Text="QRCode" TextColor="{DynamicResource PrimaryTextColor}" FontAttributes="Bold" HorizontalOptions="Center"/>
-                <Label Text="{Binding CurrentVersion,StringFormat='版本号：{0}'}" TextColor="{DynamicResource SecondaryTextColor}" HorizontalOptions="Center" FontSize="12"/>
+                <Label Text="{Binding CurrentVersion,StringFormat='Version：{0}'}" TextColor="{DynamicResource SecondaryTextColor}" HorizontalOptions="Center" FontSize="12"/>
 
                 <controls:FluentSwitch OptionName="夜间模式" IsToggled="{Binding DarkModeIsToggled}" ToggledCommand="{Binding ThemeCommand}" 
                                        OptionColor="{DynamicResource PrimaryTextColor}" InnerBackgroundColor="{DynamicResource ControlBackgroundColor}" BorderColor="{DynamicResource ControlBackgroundColor}"/>
@@ -32,10 +32,15 @@
                 <controls:FluentButton OptionName="版本更新" Description="{Binding Rate}" Command="{Binding UpdateCommand}"
                                        OptionColor="{DynamicResource PrimaryTextColor}" InnerBackgroundColor="{DynamicResource ControlBackgroundColor}" BorderColor="{DynamicResource ControlBackgroundColor}"/>
 
-                <StackLayout Orientation="Vertical" VerticalOptions="EndAndExpand" HorizontalOptions="Center">
-                    <Label Text="隐私政策、权限说明、帮助、服务条款、官网" HorizontalOptions="Center" FontSize="10" TextColor="{DynamicResource SecondaryTextColor}"/>
-                    <Label Text="CrazyPhilip" HorizontalOptions="Center" FontSize="10" TextColor="{DynamicResource SecondaryTextColor}"/>
-                    <Label Text="Copyright©2019 版权所有" HorizontalOptions="Center" FontSize="10" TextColor="{DynamicResource SecondaryTextColor}"/>
+                <StackLayout Orientation="Vertical" VerticalOptions="CenterAndExpand" HorizontalOptions="Center">
+                    <!--<Label Text="隐私政策、权限说明、帮助、服务条款、官网" HorizontalOptions="Center" FontSize="10" TextColor="{DynamicResource SecondaryTextColor}"/>-->
+                    <Label Text="Designed by CrazyPhilip" HorizontalOptions="Center" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}"/>
+                    <Label Text="www.crazyphilip.space" HorizontalOptions="Center" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer NumberOfTapsRequired="1" Command="{Binding MoreCommand}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <!--<Label Text="Copyright©2019 版权所有" HorizontalOptions="Center" FontSize="10" TextColor="{DynamicResource SecondaryTextColor}"/>-->
                 </StackLayout>
             </StackLayout>
         </ScrollView>
